@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	  xmlns:h="http://xmlns.jcp.org/jsf/html"
+	  xmlns:f="http://xmlns.jcp.org/jsf/core"
+	  xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	  xmlns:p="http://primefaces.org/ui">
+<ui:composition template="layout.xhtml">
+	<ui:define name="content">
+		<h:form id="airTicketForm">
+			<p:panel header="机票请求">
+				<h:panelGrid columns="1">
+					<p:outputLabel for="depCity" value="出发城市: " />
+					<p:inputText id="depCity" value="#{JDAirTicketController.jdAirTicketRequest.depCity}" />
+					<p:outputLabel for="arrCity" value="到达城市: " />
+					<p:inputText id="arrCity" value="#{JDAirTicketController.jdAirTicketRequest.arrCity}" />
+                    <p:outputLabel for="depDate" value="出发日期: " />
+                    <p:inputText id="depDate" value="#{JDAirTicketController.jdAirTicketRequest.depDate}" />
+					<h:commandButton value="查询" action="#{JDAirTicketController.query}">
+                        <f:ajax execute="@form" render="results" />
+                    </h:commandButton>
+				</h:panelGrid>
+			</p:panel>
+		</h:form>
+        <p:panel header="查询结果" id="results">
+            <p:dataTable id="table" var="flight" value="#{JDAirTicketController.jdAirFlightResponses}">
+                <p:column>
+                    <f:facet name="header"># 航司</f:facet>
+                    <h:outputText value="#{flight.airwaysCn}" />
+                </p:column>
+                <p:column>
+                    <f:facet name="header"># 出发日期</f:facet>
+                    <h:outputText value="#{flight.depDate}" />
+                </p:column>
+                <p:column>
+                    <f:facet name="header"># 出发城市</f:facet>
+                    <h:outputText value="#{flight.depCity}" />
+                </p:column>
+                <p:column>
+                    <f:facet name="header"># 出发时间</f:facet>
+                    <h:outputText value="#{flight.depTime}" />
+                </p:column>
+                <p:column>
+                    <f:facet name="header"># 到达日期</f:facet>
+                    <h:outputText value="#{flight.arrDate}" />
+                </p:column>
+                <p:column>
+                    <f:facet name="header"># 到达城市</f:facet>
+                    <h:outputText value="#{flight.arrCity}" />
+                </p:column>
+                <p:column>
+                    <f:facet name="header"># 到达时间</f:facet>
+                    <h:outputText value="#{flight.arrTime}" />
+                </p:column>
+                <p:column>
+                    <f:facet name="header"># 价格</f:facet>
+                    <h:outputText value="#{flight.economicPrice.adultPrice}" />
+                </p:column>
+            </p:dataTable>
+        </p:panel>
+	</ui:define>
+</ui:composition>
+</html>

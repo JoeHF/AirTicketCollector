@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	  xmlns:h="http://xmlns.jcp.org/jsf/html"
+	  xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	  xmlns:p="http://primefaces.org/ui"
+	  xmlns:t="http://xmlns.jcp.org/jsf/passthrough">
+<ui:composition template="layout.xhtml">
+	<ui:define name="content">
+		<h:form id="productForm">
+			<p:panel header="Product Details">
+				<h:panelGrid columns="1">
+					<p:outputLabel for="depCity" value="出发城市: " />
+					<p:inputText id="depCity" value="#{productController.product.depCity}" />
+					<p:outputLabel for="arrCity" value="到达城市: " />
+					<p:inputText id="arrCity" value="#{productController.product.arrCity}" />
+					<p:outputLabel for="depDate" value="出发日期: " />
+					<p:inputText id="depDate" t:type="date" t:min="2019-01-01" value="#{productController.product.depDate}" />
+					<h:commandButton value="Save" action="#{productController.save}" />
+				</h:panelGrid>
+			</p:panel>
+		</h:form>
+	</ui:define>
+</ui:composition>
+</html>
