@@ -15,8 +15,8 @@
 					<p:inputText id="depCity" value="#{productController.product.depCity}" />
 					<p:outputLabel for="arrCity" value="到达城市: " />
 					<p:inputText id="arrCity" value="#{productController.product.arrCity}" />
-					<p:outputLabel for="depDate" value="出发日期: " />
-					<p:inputText id="depDate" t:type="date" t:min="2019-01-01" value="#{productController.product.depDate}" />
+					<p:outputLabel for="depDate" value="出发日期:" />
+					<p:calendar id="depDate" value="#{productController.product.depDate}" pages="3" />
 					<h:commandButton value="Save" action="#{productController.save}" />
 				</h:panelGrid>
 			</p:panel>
