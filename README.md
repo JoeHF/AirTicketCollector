@@ -1,1 +1,2 @@
 # AirTicketCollector
+mvn fmt:format

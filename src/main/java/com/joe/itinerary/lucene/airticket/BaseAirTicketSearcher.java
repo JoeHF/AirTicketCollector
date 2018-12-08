@@ -8,10 +8,9 @@ import com.joe.itinerary.utils.Util;
 import java.io.File;
 import java.io.IOException;
 import java.util.Date;
+import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
-import org.apache.lucene.index.DirectoryReader;
-import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.index.Term;
+import org.apache.lucene.index.*;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.search.*;
 import org.apache.lucene.store.Directory;
@@ -25,7 +24,17 @@ abstract class BaseAirTicketSearcher implements AirTicketSearcherService {
   BaseAirTicketSearcher() throws IOException {
     String path = getIndexDir();
     Directory indexDirectory = FSDirectory.open(new File(path).toPath());
-    IndexReader ir = DirectoryReader.open(indexDirectory);
+    IndexReader ir;
+    try {
+      ir = DirectoryReader.open(indexDirectory);
+    } catch (Exception e) {
+      IndexWriter indexWriter =
+          new IndexWriter(indexDirectory, new IndexWriterConfig(new StandardAnalyzer()));
+      indexWriter.commit();
+      indexWriter.close();
+    } finally {
+      ir = DirectoryReader.open(indexDirectory);
+    }
     indexSearcher = new IndexSearcher(ir);
   }
 
