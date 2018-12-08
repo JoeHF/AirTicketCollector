@@ -3,6 +3,7 @@ package com.joe.itinerary.lucene.airticket;
 import static com.joe.itinerary.lucene.airticket.AirTicketIndexer.*;
 
 import com.joe.itinerary.request.AirTicketRequest;
+import com.joe.itinerary.service.AirTicketSearcherService;
 import com.joe.itinerary.utils.Util;
 import java.io.File;
 import java.io.IOException;
@@ -15,12 +16,15 @@ import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.search.*;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
+import org.springframework.stereotype.Service;
 
-public class AirTicketSearcher {
+@Service
+public class AirTicketSearcher implements AirTicketSearcherService {
+  private static String indexDir = "/Users/houfang/Lucene/AirTicket/Index";
   IndexSearcher indexSearcher;
 
-  public AirTicketSearcher(String indexDirectoryPath) throws IOException {
-    Directory indexDirectory = FSDirectory.open(new File(indexDirectoryPath).toPath());
+  public AirTicketSearcher() throws IOException {
+    Directory indexDirectory = FSDirectory.open(new File(indexDir).toPath());
     IndexReader ir = DirectoryReader.open(indexDirectory);
     indexSearcher = new IndexSearcher(ir);
   }
@@ -33,13 +37,11 @@ public class AirTicketSearcher {
             .add(
                 new TermQuery(new Term(DEP_CITY, airTicketRequest.getDepCity())),
                 BooleanClause.Occur.MUST)
-            //            .add(
-            //                new TermQuery(new Term(ARR_CITY, airTicketRequest.getArrCity())),
-            //                BooleanClause.Occur.MUST)
-            //            .add(new TermQuery(new Term(DEP_DATE, depDateString)),
-            // BooleanClause.Occur.MUST)
-            //            .add(new TermQuery(new Term(REQUEST_DATE, requestDateString)),
-            // BooleanClause.Occur.MUST)
+            .add(
+                new TermQuery(new Term(ARR_CITY, airTicketRequest.getArrCity())),
+                BooleanClause.Occur.MUST)
+            .add(new TermQuery(new Term(DEP_DATE, depDateString)), BooleanClause.Occur.MUST)
+            .add(new TermQuery(new Term(REQUEST_DATE, requestDateString)), BooleanClause.Occur.MUST)
             .build();
 
     TopDocs topDocs = indexSearcher.search(boolQuery, 10);

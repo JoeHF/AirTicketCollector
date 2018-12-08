@@ -7,7 +7,7 @@ import lombok.Data;
 @Data
 @Builder
 public class JDAirFlightResponse {
-  public static final String economicCode = "1";
+  public static final String ECONOMIC_CODE = "1";
 
   String airwaysCn;
   String depDate;
@@ -24,6 +24,6 @@ public class JDAirFlightResponse {
   FilterPriceResponse firstClassPrice;
 
   public FilterPriceResponse getEconomicPrice() {
-    return economicPrice = filterPriceMap.get(economicCode);
+    return economicPrice = filterPriceMap.get(ECONOMIC_CODE);
   }
 }
