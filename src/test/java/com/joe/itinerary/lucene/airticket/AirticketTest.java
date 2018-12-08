@@ -1,12 +1,17 @@
 package com.joe.itinerary.lucene.airticket;
 
-import static com.joe.itinerary.lucene.airticket.AirTicketIndexer.DEP_CITY;
-import static com.joe.itinerary.response.JDAirFlightResponse.economicCode;
+import static com.joe.itinerary.lucene.airticket.AirTicketIndexer.*;
+import static com.joe.itinerary.response.JDAirFlightResponse.ECONOMIC_CODE;
+import static org.junit.Assert.assertEquals;
 
 import com.google.common.collect.ImmutableMap;
+import com.joe.itinerary.Application;
+import com.joe.itinerary.lucene.data.AirTicketData;
 import com.joe.itinerary.request.AirTicketRequest;
 import com.joe.itinerary.response.FilterPriceResponse;
 import com.joe.itinerary.response.JDAirFlightResponse;
+import com.joe.itinerary.service.AirTicketIndexerService;
+import com.joe.itinerary.service.AirTicketSearcherService;
 import com.joe.itinerary.utils.Util;
 import java.io.IOException;
 import java.util.Date;
@@ -16,52 +21,65 @@ import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = Application.class)
 public class AirticketTest {
-  //    private static String testIndexDir = "/Users/houfang/Lucene/AirTicket/Test/Index";
-  private static String testIndexDir = "/Users/houfang/Lucene/AirTicket/Index";
-  private String dateNow;
-  private AirTicketIndexer airTicketIndexer;
-  private AirTicketSearcher airTicketSearcher;
+  private Date dateNow;
+  private String dateNowStr;
+
+  @Autowired
+  @Qualifier("airTicketTestIndexer")
+  private AirTicketIndexerService airTicketIndexerService;
+
+  @Autowired
+  @Qualifier("airTicketTestSearcher")
+  private AirTicketSearcherService airTicketSearcherService;
 
   @Before
-  public void setup() throws IOException {
-    dateNow = Util.dateFormat.format(new Date());
-    airTicketIndexer = new AirTicketIndexer(testIndexDir, false);
+  public void setup() {
+    dateNow = new Date();
+    dateNowStr = Util.dateFormat.format(dateNow);
   }
 
   @Test
   public void testIndexAndSearch() throws IOException {
     String depCity = "北京";
     String arrCity = "上海";
+    AirTicketRequest airTicketRequest =
+        AirTicketRequest.builder().depCity(depCity).arrCity(arrCity).depDate(dateNow).build();
+    String depCityResp = "PEK";
+    String arrCityResp = "SHA";
     JDAirFlightResponse jdAirFlightResponse =
         JDAirFlightResponse.builder()
             .airwaysCn("国航")
-            .depCity("北京")
-            .arrCity("上海")
-            .depDate(dateNow)
+            .depCity(depCityResp)
+            .arrCity(arrCityResp)
+            .depDate(dateNowStr)
             .filterPriceMap(
                 ImmutableMap.of(
-                    economicCode, FilterPriceResponse.builder().adultPrice("300").build()))
+                    ECONOMIC_CODE, FilterPriceResponse.builder().adultPrice("300").build()))
             .build();
 
-    try {
-      airTicketIndexer.indexAirTicket(jdAirFlightResponse);
-    } catch (IOException e) {
-      e.printStackTrace();
-    } finally {
-      airTicketIndexer.close();
-    }
+    airTicketIndexerService.indexAirTicket(
+        AirTicketData.builder().request(airTicketRequest).response(jdAirFlightResponse).build());
 
-    airTicketSearcher = new AirTicketSearcher(testIndexDir);
     AirTicketRequest request =
         AirTicketRequest.builder().depCity(depCity).arrCity(arrCity).depDate(new Date()).build();
     try {
-      TopDocs topDocs = airTicketSearcher.search(request);
-      for (ScoreDoc scoreDoc : topDocs.scoreDocs) {
-        Document doc = airTicketSearcher.doc(scoreDoc.doc);
-        System.out.println(doc.get(DEP_CITY));
-      }
+      TopDocs topDocs = airTicketSearcherService.search(request);
+      assertEquals(1, topDocs.totalHits);
+      ScoreDoc scoreDoc = topDocs.scoreDocs[0];
+      Document doc = airTicketSearcherService.doc(scoreDoc.doc);
+      assertEquals(depCity, doc.get(DEP_CITY));
+      assertEquals(arrCity, doc.get(ARR_CITY));
+      assertEquals(depCityResp, doc.get(DEP_CITY_RESP));
+      assertEquals(arrCityResp, doc.get(ARR_CITY_RESP));
     } catch (IOException e) {
       e.printStackTrace();
     } catch (ParseException e) {

@@ -1,15 +1,13 @@
 package com.joe.itinerary.controller;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import com.joe.itinerary.request.AirTicketRequest;
 import com.joe.itinerary.response.JDAirFlightResponse;
-import com.joe.itinerary.response.JDAirTicketResponse;
-import com.joe.itinerary.response.ResponseWrapper;
 import com.joe.itinerary.service.AirTicketService;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.lucene.queryparser.classic.ParseException;
 import org.ocpsoft.rewrite.annotation.Join;
 import org.ocpsoft.rewrite.el.ELBeanName;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,11 +42,7 @@ public class JDAirTicketController {
     this.jdAirFlightResponses = responses;
   }
 
-  public void query() {
-    String resp = airTicketService.search(jdAirTicketRequest);
-    Gson gson = new Gson();
-    ResponseWrapper<JDAirTicketResponse> responseWrapper =
-        gson.fromJson(resp, new TypeToken<ResponseWrapper<JDAirTicketResponse>>() {}.getType());
-    this.setJdAirFlightResponses(responseWrapper.getData().getFlights());
+  public void query() throws IOException, ParseException {
+    this.setJdAirFlightResponses(airTicketService.search(jdAirTicketRequest));
   }
 }

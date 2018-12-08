@@ -16,7 +16,7 @@
 					<p:outputLabel for="arrCity" value="到达城市: " />
 					<p:inputText id="arrCity" value="#{JDAirTicketController.jdAirTicketRequest.arrCity}" />
                     <p:outputLabel for="depDate" value="出发日期: " />
-                    <p:inputText id="depDate" value="#{JDAirTicketController.jdAirTicketRequest.depDate}" />
+                    <p:calendar id="depDate" value="#{JDAirTicketController.jdAirTicketRequest.depDate}" pages="3" />
 					<h:commandButton value="查询" action="#{JDAirTicketController.query}">
                         <f:ajax execute="@form" render="results" />
                     </h:commandButton>
