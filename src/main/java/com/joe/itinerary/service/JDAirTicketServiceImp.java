@@ -20,6 +20,7 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.search.TopDocs;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -28,7 +29,9 @@ public class JDAirTicketServiceImp implements AirTicketService {
   private static Map<String, String> requestParams;
   private static String indexDir = "/Users/houfang/Lucene/AirTicket/Index";
 
-  @Autowired private AirTicketSearcherService airTicketSearcherService;
+  @Autowired
+  @Qualifier("airTicketSearcher")
+  private AirTicketSearcherService airTicketSearcherService;
 
   static {
     requestParams = new HashMap<String, String>();

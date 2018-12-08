@@ -2,14 +2,13 @@ package com.joe.itinerary.lucene.airticket;
 
 import java.io.IOException;
 import javax.annotation.PreDestroy;
-import org.apache.lucene.document.*;
 import org.springframework.stereotype.Service;
 
 @Service
-public class AirTicketIndexer extends BaseAirTicketIndexer {
-  private static final String indexDir = "/Users/houfang/Lucene/AirTicket/Index";
+public class AirTicketTestIndexer extends BaseAirTicketIndexer {
+  private static final String indexDir = "/Users/houfang/Lucene/AirTicket/Test/Index";
 
-  public AirTicketIndexer() throws IOException {
+  public AirTicketTestIndexer() throws IOException {
     super();
   }
 
@@ -25,6 +24,6 @@ public class AirTicketIndexer extends BaseAirTicketIndexer {
 
   @Override
   boolean deleteAll() {
-    return false;
+    return true;
   }
 }

@@ -23,8 +23,7 @@ public class JDAirTicketController {
 
   @Autowired private AirTicketService airTicketService;
 
-  //  private AirTicketRequest jdAirTicketRequest = AirTicketRequest.builder().build();
-  private AirTicketRequest jdAirTicketRequest = new AirTicketRequest();
+  private AirTicketRequest jdAirTicketRequest = AirTicketRequest.builder().build();
   private List<JDAirFlightResponse> jdAirFlightResponses = new ArrayList<JDAirFlightResponse>();
 
   public AirTicketRequest getJdAirTicketRequest() {

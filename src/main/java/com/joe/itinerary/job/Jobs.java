@@ -20,6 +20,7 @@ import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -31,23 +32,16 @@ public class Jobs {
 
   private static String indexDir = "/Users/houfang/Lucene/AirTicket/Index";
 
-  private AirTicketService airTicketService;
-  private ProductMapper productMapper;
-  private AirTicketIndexerService airTicketIndexerService;
-  private AirTicketSearcherService airTicketSearcherService;
+  @Autowired private AirTicketService airTicketService;
+  @Autowired private ProductMapper productMapper;
 
   @Autowired
-  public Jobs(
-      AirTicketService airTicketService,
-      ProductMapper productMapper,
-      AirTicketIndexerService airTicketIndexerService,
-      AirTicketSearcherService airTicketSearcherService)
-      throws IOException {
-    this.airTicketService = airTicketService;
-    this.productMapper = productMapper;
-    this.airTicketIndexerService = airTicketIndexerService;
-    this.airTicketSearcherService = airTicketSearcherService;
-  }
+  @Qualifier("airTicketIndexer")
+  private AirTicketIndexerService airTicketIndexerService;
+
+  @Autowired
+  @Qualifier("airTicketSearcher")
+  private AirTicketSearcherService airTicketSearcherService;
 
   @Scheduled(fixedDelay = ONE_Minute)
   public void fixedDelayJob() {
@@ -77,17 +71,13 @@ public class Jobs {
     }
 
     Product product = products.get(0);
-    AirTicketRequest airTicketRequest = new AirTicketRequest();
-    airTicketRequest.setArrCity(product.getArrCity());
-    airTicketRequest.setDepCity(product.getDepCity());
-    airTicketRequest.setDepDate(product.getDepDate());
-    TopDocs topDocs = airTicketSearcherService.search(airTicketRequest);
-    //        airTicketSearcherService.search(
-    //            AirTicketRequest.builder()
-    //                .depCity(product.getDepCity())
-    //                .arrCity(product.getArrCity())
-    //                .depDate(product.getDepDate())
-    //                .build());
+    TopDocs topDocs =
+        airTicketSearcherService.search(
+            AirTicketRequest.builder()
+                .depCity(product.getDepCity())
+                .arrCity(product.getArrCity())
+                .depDate(product.getDepDate())
+                .build());
 
     for (ScoreDoc scoreDoc : topDocs.scoreDocs) {
       Document doc = airTicketSearcherService.doc(scoreDoc.doc);
@@ -107,18 +97,13 @@ public class Jobs {
   public void cronJob() throws IOException, ParseException {
     List<Product> products = productMapper.selectAll();
     for (Product product : products) {
-      AirTicketRequest request = new AirTicketRequest();
-      request.setArrCity(product.getArrCity());
-      request.setDepCity(product.getDepCity());
-      request.setDepDate(product.getDepDate());
-
-      //      AirTicketRequest request =
-      //          AirTicketRequest.builder()
-      //              .arrCity(product.getArrCity())
-      //              .depCity(product.getDepCity())
-      //              .arrDate(product.getDepDate())
-      //              .depDate(product.getDepDate())
-      //              .build();
+      AirTicketRequest request =
+          AirTicketRequest.builder()
+              .arrCity(product.getArrCity())
+              .depCity(product.getDepCity())
+              .arrDate(product.getDepDate())
+              .depDate(product.getDepDate())
+              .build();
 
       JDAirTicketResponse jdAirTicketResponse =
           JDAirTicketResponse.builder().flights(airTicketService.search(request)).build();
